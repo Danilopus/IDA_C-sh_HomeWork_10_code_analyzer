@@ -1,0 +1,116 @@
+// HOMEWORK TEMPLATE 1.4 // DATE: 17.10.2023
+
+USING SERVICE;
+USING SYSTEM;
+USING SYSTEM.LINQ;
+USING SYSTEM.LINQ.EXPRESSIONS;
+USING SYSTEM.TEXT;
+
+/// QUESTIONS ///
+/// 1. 
+
+// HOMEWORK 10 : [{АНАЛИЗАТОР КОДА}] --------------------------------
+
+NAMESPACE IDA_C_SH_HOMEWORK
+{
+ INTERNAL CLASS PROGRAM
+ {
+ STATIC VOID MAIN(STRING[] ARGS)
+ {
+
+ MAINMENU.MAINMENU MAINMENU = NEW MAINMENU.MAINMENU();
+
+ DO
+ {
+ CONSOLE.CLEAR();
+ MAINMENU.SHOW_MENU();
+ if (MAINMENU.USER_CHOICE_HANDLE() == 0) BREAK;
+ CONSOLE.READKEY();
+ } WHILE (TRUE);
+ // CONSOLE.READKEY();
+ }
+
+ PUBLIC STATIC VOID TASK_1(STRING WORK_NAME)
+ /* ЗАДАНИЕ
+ * ПРОГРАММА «АНАЛИЗАТОР КОДА»
+ ПРОЧИТАТЬ ТЕКСТ C#-ПРОГРАММЫ (ВЫБРАТЬ САМОСТОЯТЕЛЬНО) и ВЫПОЛНИТЬ с НИМ: 
+ 1) ВСЕ СЛОВА PUBLIC в ОБЪЯВЛЕНИИ ПОЛЕЙ КЛАССОВ ЗАМЕНИТЬ на СЛОВО PRIVATE. 
+ 2) в ИСХОДНОМ КОДЕ в КАЖДОМ СЛОВЕ ДЛИННЕЕ ДВУХ СИМВОЛОВ ВСЕ СТРОЧНЫЕ СИМВОЛЫ ЗАМЕНИТЬ ПРОПИСНЫМИ. 
+ 3) ТАКЖЕ в КОДЕ ПРОГРАММЫ УДАЛИТЬ ВСЕ «ЛИШНИЕ» ПРОБЕЛЫ и ТАБУЛЯЦИИ, ОСТАВИВ ТОЛЬКО НЕОБХОДИМЫЕ ДЛЯ РАЗДЕЛЕНИЯ ОПЕРАТОРОВ. 
+ 4) ЗАПИСАТЬ СИМВОЛЫ КАЖДОЙ СТРОКИ ПРОГРАММЫ в ДРУГОЙ ФАЙЛ в ОБРАТНОМ ПОРЯДКЕ. 
+ */
+ {
+ CONSOLE.WRITELINE("\N***\T{0}\N\N", WORK_NAME);
+
+ // ПУТЬ к ПАПКЕ с КОДОВЫМИ ФАЙЛАМИ c // на КОНЦЕ
+ STRING CODE_FILE_DIRECTORY_PATH = DIRECTORY.GETCURRENTDIRECTORY().REPLACE("BIN\\DEBUG\\NET6.0", "");
+ // ФАЙЛ с ВНЕСЕННЫМИ ИЗМЕНЕНИЯМИ по ЗАДАНИЮ
+ STRING SOURCE_PATH = CODE_FILE_DIRECTORY_PATH + "TEST_CODE_SOURCE.CS.TXT";
+ // ФАЙЛ с ВНЕСЕННЫМИ ИЗИЕНЕИЯМИ по ЗАДАНИЮ и ИНВЕРТИРОВАННЫЙ
+ STRING INVERTED_PATH = CODE_FILE_DIRECTORY_PATH + "TEST_CODE_INVERTED.CS.TXT";
+ // ВЫБЕРЕМ ОДИН из ФАЙЛОВ ТЕКУЩЕГО ПРОЕКТА и СКОПИРУЕМ в СТРОКУ ДЛЯ ДАЛЬНЕЙШЕЙ КОНВЕРСИИ КОДА
+ STRING[] FILES_AT_PROJECT = DIRECTORY.GETFILES(CODE_FILE_DIRECTORY_PATH);
+ if (FILES_AT_PROJECT == NULL) THROW NEW EXCEPTION("FILESNOTREADEXEPTION");
+ if (FILES_AT_PROJECT.LENGTH == 0 ) THROW NEW EXCEPTION("FILESNOTFOUNDEXEPTION");
+ STRING READ_RESULT;
+ FILESTREAM STR_1 = NEW(FILES_AT_PROJECT[0], FILEMODE.OPEN);
+ {
+ STREAMREADER STREAMREADER_1 = NEW STREAMREADER(STR_1);
+ READ_RESULT = STREAMREADER_1.READTOEND();
+ READ_RESULT ??= STRING.EMPTY;
+ }
+ STR_1.CLOSE();
+
+ // БЛОК ИЗМЕНЕНИЙ СОДЕРЖИМОГО СТРОКИ 
+ STRING CHANGED_CODE = READ_RESULT.REPLACE("PRIVATE CLASS", "PRIVATE CLASS");
+
+ // За СЧЕТ ОПЦИИ STRINGSPLITOPTIONS.REMOVEEMPTYENTRIES УБЕРЕМ ЛИШНИЕ ТАБУЛЯЦИИ
+ //VAR ARRAY_OF_WORDS = CHANGED_CODE.SPLIT('\T', STRINGSPLITOPTIONS.REMOVEEMPTYENTRIES);
+ VAR ARRAY_OF_WORDS = CHANGED_CODE.SPLIT("\T", STRINGSPLITOPTIONS.REMOVEEMPTYENTRIES);
+
+ // СОБИРАЕМ ТЕКСТ ОБРАТНО в СТРОКУ
+ CHANGED_CODE = STRING.EMPTY;
+ FOREACH (STRING WORD in ARRAY_OF_WORDS) CHANGED_CODE += WORD;
+
+ // За СЧЕТ ОПЦИИ STRINGSPLITOPTIONS.REMOVEEMPTYENTRIES УДАЛИМ ЛИШНИЕ ПРОБЕЛЫ
+ ARRAY_OF_WORDS = CHANGED_CODE.SPLIT(' ', STRINGSPLITOPTIONS.REMOVEEMPTYENTRIES);
+
+ // В СЛОВАХ БОЛЬШЕ 2-УХ СИМВОЛОВ ИЗМЕНИМ РЕГИСТР
+ FOR (INT i = 0; i < ARRAY_OF_WORDS.LENGTH; I++)
+ if (ARRAY_OF_WORDS[I].LENGTH > 2) ARRAY_OF_WORDS[I] = ARRAY_OF_WORDS[I].TOUPPER();
+
+ // СОБИРАЕМ ТЕКСТ ОБРАТНО в СТРОКУ
+ CHANGED_CODE = STRING.EMPTY;
+ FOREACH (STRING WORD in ARRAY_OF_WORDS) CHANGED_CODE += WORD + ' ';
+
+ // ЗАПИШЕМ в ФАЙЛ КОД с ВНЕСЕННЫМИ ИЗМЕНЕНИЯМИ
+ FILESTREAM STR_2 = NEW(SOURCE_PATH, FILEMODE.CREATE); 
+ STREAMWRITER STREAMWRITER_1 = NEW STREAMWRITER(STR_2);
+ STREAMWRITER_1.WRITE(CHANGED_CODE);
+ STREAMWRITER_1.CLOSE();
+ STR_2.CLOSE();
+
+ // РАЗОБЪЕМ КОД на СТРОКИ
+ ARRAY_OF_WORDS = CHANGED_CODE.SPLIT('\N', STRINGSPLITOPTIONS.REMOVEEMPTYENTRIES);
+
+ // ЗАПИШЕМ в ФАЙЛ КОД с ВНЕСЕННЫМИ ИЗМЕНЕНИЯМИ в ИНВЕРСНОМ ПОРЯДКЕ СИМВОЛЫ КАЖДОЙ СТРОКИ ПРОГРАММЫ
+ FILESTREAM STR_3 = NEW(INVERTED_PATH, FILEMODE.CREATE);
+ STREAMWRITER STREAMWRITER_2 = NEW STREAMWRITER(STR_3);
+
+
+ STRING TEMP;
+ FOREACH (STRING WORD in ARRAY_OF_WORDS)
+ {
+ CHAR[] CHARARRAY = WORD.TOCHARARRAY();
+ //CHARARRAY.REVERSE();
+ ARRAY.REVERSE(CHARARRAY);
+ STREAMWRITER_2.WRITE(NEW STRING(CHARARRAY));
+ }
+ STREAMWRITER_2.CLOSE();
+ STR_3.CLOSE();
+ }
+
+
+
+ }// CLASS PROGRAM
+}// NAMESPACE 

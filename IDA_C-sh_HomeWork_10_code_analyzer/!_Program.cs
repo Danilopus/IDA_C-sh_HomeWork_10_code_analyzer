@@ -2,6 +2,7 @@
 
 using Service;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -41,13 +42,14 @@ namespace IDA_C_sh_HomeWork
         {
             Console.WriteLine("\n***\t{0}\n\n", work_name);
 
+            // путь к папке с кодовыми файлами c // на конце
+            string code_file_directory_path = Directory.GetCurrentDirectory().Replace("bin\\Debug\\net6.0", "");
             // файл с внесенными изменениями по заданию
-            string source_path = Directory.GetCurrentDirectory() + "\\test_code_source.cs";
+            string source_path = code_file_directory_path + "test_code_source.cs.txt";
             // файл с внесенными изиенеиями по заданию и инвертированный
-            string inverted_path = Directory.GetCurrentDirectory() + "\\test_code_inverted.cs";
-
+            string inverted_path = code_file_directory_path + "test_code_inverted.cs.txt";
             // Выберем один из файлов текущего проекта и скопируем в строку для дальнейшей конверсии кода
-            string[] files_at_project = Directory.GetFiles(Directory.GetCurrentDirectory());
+            string[] files_at_project = Directory.GetFiles(code_file_directory_path);
             if (files_at_project == null) throw new Exception("FilesNotReadExeption");
             if (files_at_project.Length == 0 ) throw new Exception("FilesNotFoundExeption");
             string read_result;
@@ -62,8 +64,9 @@ namespace IDA_C_sh_HomeWork
             // Блок изменений содержимого строки            
             string changed_code = read_result.Replace("public class", "private class");
 
-            // уберем лишние табуляции
-            var array_of_words = changed_code.Split('\t', StringSplitOptions.RemoveEmptyEntries);
+            // За счет опции StringSplitOptions.RemoveEmptyEntries уберем лишние табуляции
+            //var array_of_words = changed_code.Split('\t', StringSplitOptions.RemoveEmptyEntries);
+            var array_of_words = changed_code.Split("\t", StringSplitOptions.RemoveEmptyEntries);
 
             // собираем текст обратно в строку
             changed_code = string.Empty;
@@ -78,7 +81,7 @@ namespace IDA_C_sh_HomeWork
 
             // собираем текст обратно в строку
             changed_code = string.Empty;
-            foreach (string word in array_of_words) changed_code += word;
+            foreach (string word in array_of_words) changed_code += word + ' ';
 
             // Запишем в файл код с внесенными изменениями
             FileStream str_2 = new(source_path, FileMode.Create);             
@@ -93,7 +96,16 @@ namespace IDA_C_sh_HomeWork
             // Запишем в файл код с внесенными изменениями в инверсном порядке символы каждой строки программы
             FileStream str_3 = new(inverted_path, FileMode.Create);
             StreamWriter streamWriter_2 = new StreamWriter(str_3);
-            foreach (string word in array_of_words) streamWriter_2.Write(word.Reverse());            
+
+
+            string temp;
+            foreach (string word in array_of_words)
+            {
+                char[] charArray = word.ToCharArray();
+                //charArray.Reverse();
+                Array.Reverse(charArray);
+                streamWriter_2.Write(new string(charArray));
+            }
             streamWriter_2.Close();
             str_3.Close();
         }
